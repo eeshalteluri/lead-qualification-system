@@ -2,9 +2,9 @@ import 'dotenv/config';
 import { z } from 'zod';
 
 const envSchema = z.object({
-    PORT: z.number(),
+    PORT: z.coerce.number(),
     OPENAI_API_KEY: z.string(),
-    DATABSE_URL: z.url(),
+    DATABASE_URL: z.url(),
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });
 
