@@ -13,3 +13,57 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Offer {
+  id               Int      @id @default(autoincrement())
+  name             String
+  value_props      String[]
+  ideal_use_cases  String[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  results          Result[]
+}
+
+model Lead {
+  id         Int      @id @default(autoincrement())
+  name       String
+  role       String
+  company    String
+  industry   String
+  location   String
+  linkedin_bio String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  results    Result[]
+}
+
+model Result {
+  id          Int      @id @default(autoincrement())
+  leadId      Int
+  offerId     Int
+  intent      IntentLevel
+  score       Int
+  reasoning   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  //Mapping leads and offers to products
+  //Auto-deleting result if any lead or offer is deleted
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  offer       Offer    @relation(fields: [offerId], references: [id], onDelete: Cascade) 
+
+  //Added indexing for faster lookup
+  @@index([leadId])
+  @@index([offerId])
+
+  //No duplicate results are allowed for same leadId AND offerId 
+  @@unique([leadId, offerId])
+}
+
+enum IntentLevel {
+  high     @map("High")
+  medium   @map("Medium")
+  low      @map("Low")
+}
